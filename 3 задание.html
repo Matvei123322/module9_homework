@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 задание</title>
+    <link rel="stylesheet" type="text/css" href="3 задание.css">
+</head>
+<body>
+    <input type="number" id="input" placeholder="Введите число от 1 до 10">
+    <button id="button">Получить картинки</button>
+    <div id="images"></div>
+    <div id="error"></div>
+    <script>
+        const input = document.getElementById("input");
+        const button = document.getElementById("button");
+        const imagesDiv = document.getElementById("images");
+        const errorDiv = document.getElementById("error");
+
+        button.addEventListener("click", () => {
+            const number = Number(input.value);
+            if (number < 1 || number > 10) {
+                errorDiv.textContent = "Число вне диапазона от 1 до 10";
+                imagesDiv.innerHTML = "";
+                return;
+            }
+            errorDiv.innerHTML = "";
+            const url = `https://picsum.photos/v2/list?limit=${number}`;
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.addEventListener("load", () => {
+                const response = JSON.parse(xhr.responseText);
+                imagesDiv.innerHTML = response.map(item => `<img src="${item.download_url}">`).join("");
+            });
+            xhr.send();
+        });
+    </script>
+</body>
+</html>
