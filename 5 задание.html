@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 задание</title>
+    <link rel="stylesheet" type="text/css" href="5 задание.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form">
+          <label for="page">Номер страницы:</label>
+          <input type="text" id="page" name="page" placeholder="Введите номер страницы">
+      
+          <label for="limit">Лимит:</label>
+          <input type="text" id="limit" name="limit" placeholder="Введите лимит">
+      
+          <button id="submit">Запрос</button>
+        </div>
+      
+        <div id="images"></div>
+        <div id="error"></div>
+      </div>
+
+    <script>
+        const pageInput = document.getElementById('page');
+        const limitInput = document.getElementById('limit');
+        const submitButton = document.getElementById('submit');
+        const errorDiv = document.getElementById('error');
+        const imagesDiv = document.getElementById('images');
+
+        let lastPage = localStorage.getItem('page') || 1;
+        let lastLimit = localStorage.getItem('limit') || 10;
+
+        pageInput.value = lastPage;
+        limitInput.value = lastLimit;
+
+        function showError(message) {
+          errorDiv.textContent = message;
+          imagesDiv.innerHTML = '';
+        }
+
+        function clearError() {
+          errorDiv.textContent = '';
+        }
+
+        function showImages(images) {
+          errorDiv.textContent = '';
+          imagesDiv.innerHTML = images
+          .map(image => `<img src="${image.download_url}" alt="${image.author}">`)
+          .join('');
+        }
+
+        function makeRequest() {
+          const page = parseInt(pageInput.value);
+          const limit = parseInt(limitInput.value);
+
+          if (isNaN(page) || page < 1 || page > 10) {
+            showError('Номер страницы вне диапазона от 1 до 10');
+            return;
+          }
+
+          if (isNaN(limit) || limit < 1 || limit > 10) {
+            showError('Лимит вне диапазона от 1 до 10');
+            return;
+          }
+
+          if (isNaN(limit) || limit < 1 || limit > 10 || isNaN(page) || page < 1 || page > 10) {
+            showError('Номер страницы и лимит вне диапазона от 1 до 10');
+            return;
+          }
+
+          clearError();
+
+          fetch(`https://picsum.photos/v2/list?page=${page}&limit=${limit}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Ошибка получения данных');
+            }
+            return response.json();
+          })
+          .then(images => {
+            showImages(images);
+            localStorage.setItem('page', page);
+            localStorage.setItem('limit', limit);
+          })
+          .catch(error => {
+            showError(error.message);
+          });
+        }
+
+        submitButton.addEventListener('click', makeRequest);
+    </script>
+</body>
+</html>
